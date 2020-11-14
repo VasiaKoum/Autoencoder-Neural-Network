@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from itertools import zip_longest
 from sklearn.model_selection import train_test_split
 from keras.models import Model, model_from_json
@@ -92,23 +93,11 @@ def load_model(modelname):
     return autoencoder
 
 def error_graphs(modeltrain):
-    print(modeltrain.history.keys())
-    # dict_keys(['loss', 'val_loss'])
-    #  "Accuracy"
-    # plt.plot(modeltrain.history['acc'])
-    # plt.plot(modeltrain.history['val_acc'])
-    # plt.title('model accuracy')
-    # plt.ylabel('accuracy')
-    # plt.xlabel('epoch')
-    # plt.legend(['train', 'validation'], loc='upper left')
-    # plt.show()
-    # "Loss"
-    plt.plot(modeltrain.history['loss'])
-    plt.plot(modeltrain.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
+    plt.plot(modeltrain.history['loss'], label='train')
+    plt.plot(modeltrain.history['val_loss'], label='test')
+    plt.title('Loss / Mean Squared Error')
+    plt.ylabel('Loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 
 def reshape_dataset(dataset, numarray):
@@ -127,23 +116,25 @@ def user_choices(model, modelname, modeltrain):
         try:
             parameters.clear()
             run_again = int(input("\nUSER CHOICES: choose one from below options(1-4): \n1)Execute program with different hyperparameters\n2)Show error-graphs\n3)Save the existing model\n4)Exit\n---------------> "))
-            if(run_again==1):
-                parameters.append(int(input("Type number of layers: ")))
-                parameters.append(int(input("Type filter size: ")))
-                parameters.append(int(input("Type number of filters/layer: ")))
-                parameters.append(int(input("Type number of epochs: ")))
-                parameters.append(int(input("Type batch size: ")))
-                break;
-            elif(run_again == 2):
-                error_graphs(modeltrain)
-            elif(run_again == 3):
-                save_model(model, modelname)
-            elif(run_again == 4):
-                continue_flag = False
-                print("Program terminates...\n")
-                break;
-            else:
-                print("Invalid choice.Try again\n")
         except:
             print("Invalid choice.Try again\n")
+
+        if(run_again==1):
+            parameters.append(int(input("Type number of layers: ")))
+            parameters.append(int(input("Type filter size: ")))
+            parameters.append(int(input("Type number of filters/layer: ")))
+            parameters.append(int(input("Type number of epochs: ")))
+            parameters.append(int(input("Type batch size: ")))
+            break;
+        elif(run_again == 2):
+            error_graphs(modeltrain)
+        elif(run_again == 3):
+            save_model(model, modelname)
+        elif(run_again == 4):
+            continue_flag = False
+            print("Program terminates...\n")
+            break;
+        else:
+            print("Invalid choice.Try again\n")
+
     return parameters, continue_flag;

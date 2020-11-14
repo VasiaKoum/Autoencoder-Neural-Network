@@ -28,7 +28,7 @@ def main():
         input_img = Input(shape=(numarray[2], numarray[3], 1))
         autoencoder = Model(input_img, decoder(encoder(input_img, 4, 32), 4, 32))
         autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
-        autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=1240, epochs=2, verbose=1, validation_data=(valid_X, valid_Y))
+        autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=124, epochs=5, verbose=1, validation_data=(valid_X, valid_Y))
         # train_ER = autoencoder.evaluate(train_X, train_Y, verbose=1)
 
         # autoencoder = load_model("autoencoder")
