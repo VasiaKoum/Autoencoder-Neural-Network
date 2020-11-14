@@ -26,48 +26,49 @@ def bytes_group(n, iterable, fillvalue=None):
 def encoder(input_img, layers, filters):
     mask_size = 3
     conv = input_img
-    for i in range(layers):
-        # conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
-        # conv = BatchNormalization()(conv)
-        # conv = MaxPooling2D(pool_size=(2,2))(conv)
-        print("Encoder: ", i, filters)
-        filters*=2
-    # return conv, filters
-    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(input_img) #28 x 28 x 32
+    # for i in range(layers):
+    #     conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
+    #     conv = BatchNormalization()(conv)
+    #     conv = MaxPooling2D(pool_size=(2,2))(conv)
+    #     print("Encoder: ", i, filters)
+    #     filters*=2
+    # return conv
+
+    conv1 = Conv2D(8, (3, 3), activation='relu', padding='same')(input_img) #28 x 28 x 8
     conv1 = BatchNormalization()(conv1)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1) #14 x 14 x 32
-    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(pool1) #14 x 14 x 64
+    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)                           #14 x 14 x 8
+    conv2 = Conv2D(16, (3, 3), activation='relu', padding='same')(pool1)    #14 x 14 x 16
     conv2 = BatchNormalization()(conv2)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2) #7 x 7 x 64
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2) #7 x 7 x 128
+    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)                           #7 x 7 x 16
+    conv3 = Conv2D(32, (3, 3), activation='relu', padding='same')(pool2)    #7 x 7 x 32
     conv3 = BatchNormalization()(conv3)
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv3) #7 x 7 x 256
+    conv4 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv3)    #7 x 7 x 64
     conv4 = BatchNormalization()(conv4)
     return conv4
 
 def decoder(conv, layers, filters):
     mask_size = 3
     filters = filters*pow(2,layers-1)
-    print(layers)
-    for i in range(layers):
-        # conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
-        # conv = BatchNormalization()(conv)
-        # conv = UpSampling2D((2,2))(conv)
-        print("Decoder: ", i, filters)
-        filters/=2
+    # for i in range(layers):
+    #     conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
+    #     conv = BatchNormalization()(conv)
+    #     conv = UpSampling2D((2,2))(conv)
+    #     print("Decoder: ", i, filters)
+    #     filters/=2
     # conv = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(conv)
     # return conv
-    conv5 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv) #7 x 7 x 256
+
+    conv5 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv)     #7 x 7 x 64
     conv5 = BatchNormalization()(conv5)
-    conv6 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv5) #7 x 7 x 128
+    conv6 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv5)    #7 x 7 x 32
     conv6 = BatchNormalization()(conv6)
-    conv7 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv5) #7 x 7 x 64
+    conv7 = Conv2D(16, (3, 3), activation='relu', padding='same')(conv5)    #7 x 7 x 16
     conv7 = BatchNormalization()(conv7)
-    up1 = UpSampling2D((2,2))(conv7) #14 x 14 x 64
-    conv8 = Conv2D(32, (3, 3), activation='relu', padding='same')(up1) # 14 x 14 x 32
+    up1 = UpSampling2D((2,2))(conv7)                                        #14 x 14 x 16
+    conv8 = Conv2D(8, (3, 3), activation='relu', padding='same')(up1)       #14 x 14 x 8
     conv8 = BatchNormalization()(conv8)
-    up2 = UpSampling2D((2,2))(conv8) # 28 x 28 x 32
-    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(up2) # 28 x 28 x 1
+    up2 = UpSampling2D((2,2))(conv8)                                        #28 x 28 x 8
+    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(up2)  #28 x 28 x 1
     return decoded
 
 def save_model(model, modelname):
@@ -90,19 +91,36 @@ def load_model(modelname):
     autoencoder.load_weights(modelname+".h5")
     return autoencoder
 
-def error_graphs():
-    print("Here error_graphs")
+def error_graphs(modeltrain):
+    print(modeltrain.history.keys())
+    # dict_keys(['loss', 'val_loss'])
+    #  "Accuracy"
+    # plt.plot(modeltrain.history['acc'])
+    # plt.plot(modeltrain.history['val_acc'])
+    # plt.title('model accuracy')
+    # plt.ylabel('accuracy')
+    # plt.xlabel('epoch')
+    # plt.legend(['train', 'validation'], loc='upper left')
+    # plt.show()
+    # "Loss"
+    plt.plot(modeltrain.history['loss'])
+    plt.plot(modeltrain.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.show()
 
 def reshape_dataset(dataset, numarray):
     train_X, valid_X, train_Y, valid_Y = train_test_split(dataset, dataset, test_size=0.2, random_state=13)
     # Reshapes to (x, rows, columns)
-    train_X = np.reshape(train_X, (-1, numarray[2], numarray[3]))
-    valid_X = np.reshape(valid_X, (-1, numarray[2], numarray[3]))
-    train_Y = np.reshape(train_Y, (-1, numarray[2], numarray[3]))
-    valid_Y = np.reshape(valid_Y, (-1, numarray[2], numarray[3]))
+    train_X = np.reshape(train_X.astype('float32') / 255., (-1, numarray[2], numarray[3]))
+    valid_X = np.reshape(valid_X.astype('float32') / 255., (-1, numarray[2], numarray[3]))
+    train_Y = np.reshape(train_Y.astype('float32') / 255., (-1, numarray[2], numarray[3]))
+    valid_Y = np.reshape(valid_Y.astype('float32') / 255., (-1, numarray[2], numarray[3]))
     return train_X, valid_X, train_Y, valid_Y
 
-def user_choices(model, modelname):
+def user_choices(model, modelname, modeltrain):
     parameters = []
     continue_flag = True
     while(True):
@@ -117,7 +135,7 @@ def user_choices(model, modelname):
                 parameters.append(int(input("Type batch size: ")))
                 break;
             elif(run_again == 2):
-                error_graphs()
+                error_graphs(modeltrain)
             elif(run_again == 3):
                 save_model(model, modelname)
             elif(run_again == 4):
