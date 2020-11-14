@@ -23,22 +23,41 @@ def numpy_from_dataset(inputpath, numbers):
 def bytes_group(n, iterable, fillvalue=None):
     return zip_longest(*[iter(iterable)]*n, fillvalue=fillvalue)
 
-def encoder(input_img):
+def encoder(input_img, layers, filters):
+    mask_size = 3
+    conv = input_img
+    for i in range(layers):
+        # conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
+        # conv = BatchNormalization()(conv)
+        # conv = MaxPooling2D(pool_size=(2,2))(conv)
+        print("Encoder: ", i, filters)
+        filters*=2
+    # return conv, filters
     conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(input_img) #28 x 28 x 32
     conv1 = BatchNormalization()(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1) #14 x 14 x 32
     conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(pool1) #14 x 14 x 64
     conv2 = BatchNormalization()(conv2)
     pool2 = MaxPooling2D(pool_size=(2, 2))(conv2) #7 x 7 x 64
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2) #7 x 7 x 128 (small & thick)
+    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2) #7 x 7 x 128
     conv3 = BatchNormalization()(conv3)
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv3) #7 x 7 x 256 (small & thick)
+    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv3) #7 x 7 x 256
     conv4 = BatchNormalization()(conv4)
     return conv4
 
-def decoder(convenc):
-    #decoder
-    conv5 = Conv2D(256, (3, 3), activation='relu', padding='same')(convenc) #7 x 7 x 256
+def decoder(conv, layers, filters):
+    mask_size = 3
+    filters = filters*pow(2,layers-1)
+    print(layers)
+    for i in range(layers):
+        # conv = Conv2D(filters, (mask_size, mask_size), activation='relu', padding='same')(conv)
+        # conv = BatchNormalization()(conv)
+        # conv = UpSampling2D((2,2))(conv)
+        print("Decoder: ", i, filters)
+        filters/=2
+    # conv = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(conv)
+    # return conv
+    conv5 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv) #7 x 7 x 256
     conv5 = BatchNormalization()(conv5)
     conv6 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv5) #7 x 7 x 128
     conv6 = BatchNormalization()(conv6)
@@ -88,7 +107,7 @@ def user_choices(model, modelname):
     continue_flag = True
     while(True):
         try:
-            parameter.clear()
+            parameters.clear()
             run_again = int(input("\nUSER CHOICES: choose one from below options(1-4): \n1)Execute program with different hyperparameters\n2)Show error-graphs\n3)Save the existing model\n4)Exit\n---------------> "))
             if(run_again==1):
                 parameters.append(int(input("Type number of layers: ")))

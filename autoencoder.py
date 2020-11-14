@@ -26,7 +26,7 @@ def main():
     while(True):
         print("Begin building model...")
         input_img = Input(shape=(numarray[2], numarray[3], 1))
-        autoencoder = Model(input_img, decoder(encoder(input_img)))
+        autoencoder = Model(input_img, decoder(encoder(input_img, 4, 32), 4, 32))
         autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
         # autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=32, epochs=5,verbose=1,validation_data=(valid_X, valid_Y))
 
