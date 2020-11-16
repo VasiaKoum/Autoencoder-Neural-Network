@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from itertools import zip_longest
 from sklearn.model_selection import train_test_split
 from keras.models import Model, model_from_json
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, BatchNormalization
+from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, BatchNormalization, Flatten, Dense
 
 def numpy_from_dataset(inputpath, numbers):
     pixels = []
@@ -120,3 +120,7 @@ def user_choices(model, modelname, modeltrain, parameters, train_time):
             print("Invalid choice.Try again\n")
 
     return parameters, continue_flag;
+
+
+def fcTraining(model):
+    print("train fully connected layers")
