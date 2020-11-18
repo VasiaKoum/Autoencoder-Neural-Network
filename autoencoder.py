@@ -21,25 +21,25 @@ def main():
     if(len(numarray)!=4 or len(pixels)==0):
         sys.exit("Input dataset does not have the required number of values")
     train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
-    print("Data ready in numpy array!")
-    parameters = [4, 3, 8, 5, 100] # Layers,Filter_size,Filters_start,Epochs,Batch_size
+    print("Data ready in numpy array!\n")
+    # Layers, Filter_size, Filters/Layer, Epochs, Batch_size
+    parameters = [4, 3, 6, 2, 2000]
+    # parameters = input_parameters()
+    newparameter = [[] for i in range(len(parameters))]
 
     while(True):
-        print("Begin building model...")
+        print("\nBegin building model...")
         input_img = Input(shape=(numarray[2], numarray[3], 1))
         autoencoder = Model(input_img, decoder(encoder(input_img, parameters), parameters))
         autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
         train_time = time.time()
         autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(valid_X, valid_Y))
         train_time = time.time() - train_time
-        train_ER = autoencoder.evaluate(train_X, train_Y, verbose=1)
-        print(train_ER)
-
-        # autoencoder = load_model("autoencoder")
-        # autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
+        # train_ER = autoencoder.evaluate(train_X, train_Y, verbose=1)
+        # print(train_ER)
 
         # User choices:
-        parameters, continue_flag = user_choices(autoencoder, "autoencoder", autoencoder_train, parameters, train_time)
+        parameters, continue_flag = user_choices(autoencoder, autoencoder_train, parameters, train_time, newparameter)
         if(not continue_flag):
             break;
 
