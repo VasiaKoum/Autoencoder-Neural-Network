@@ -32,7 +32,7 @@ def main():
             test_labels = sys.argv[i + 1]
         elif sys.argv[i] == "-model":
             argcheck[4] = True
-            autoencoder_h5 = sys.argv[i + 1]
+            autoencoder = sys.argv[i + 1]
     for i in range(0, 5):
         if argcheck[i] is False:
             sys.exit("Wrong or missing parameter. Please execute with –d <training set> –dl <traininglabels> -t <testset> -tl <test labels> -model <autoencoder h5>")
@@ -44,8 +44,30 @@ def main():
     # train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
     # print("Data ready in numpy array!")
 
-    autoencoder = load_model(autoencoder_h5)
-    autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
+    pixels, numarray = numpy_from_dataset(trainset, 4)
+    if len(numarray) != 4 or len(pixels) == 0:
+        sys.exit("Input dataset does not have the required number of values")
+    parameters = [4, 3, 8, 5, 100]
+    input_img = Input(shape=(numarray[2], numarray[3], 1))
+    encoding = Model(input_img, encoder(input_img, parameters))
+    encoding.summary()
+    # print(encoding.layers)
+
+    encoderModel = load_model(autoencoder)
+    encoderModel.load_weights(autoencoder + ".h5")
+    encoderModel.compile(loss='mean_squared_error', optimizer=RMSprop())
+    encoderModel.summary()
+    for layer in encoderModel.layers[10:17]:
+        layer.trainable = False
+    encoderModel.summary()
+
+    x = encoderModel(input_img)
+    output = fcTraining(x)
+
+    model = Model(inputs=input_img, outputs=output)
+    print(model.summary())
+    #plot_model(model, to_file='convolutional_neural_network.png')
+
 
     # while(True):
         # print("Begin building model...")

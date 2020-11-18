@@ -107,7 +107,7 @@ def user_choices(model, modelname, modeltrain, parameters, train_time):
             parameters.append(int(input("Type number of filters/layer: ")))
             parameters.append(int(input("Type number of epochs: ")))
             parameters.append(int(input("Type batch size: ")))
-            break;
+            break
         elif(run_again == 2):
             error_graphs(modeltrain, parameters, train_time)
         elif(run_again == 3):
@@ -115,12 +115,16 @@ def user_choices(model, modelname, modeltrain, parameters, train_time):
         elif(run_again == 4):
             continue_flag = False
             print("Program terminates...\n")
-            break;
+            break
         else:
             print("Invalid choice.Try again\n")
 
-    return parameters, continue_flag;
+    return parameters, continue_flag
 
 
-def fcTraining(model):
+def fcTraining(input):
+    flat = Flatten()(input)
+    hidden = Dense(10, activation='relu')(flat)
+    output = Dense(1, activation='sigmoid')(hidden)
     print("train fully connected layers")
+    return output
