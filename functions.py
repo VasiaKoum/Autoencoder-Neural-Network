@@ -143,9 +143,26 @@ def input_parameters():
         print("Invalid choice.Try again\n")
     return parameters
 
-def fcTraining(input):
+
+
+def encoder_layers(autoencoder, autoencoderLayers, input):
+    encoderLayers = autoencoderLayers
+    x = input
+    for layer in autoencoder.layers[0:encoderLayers]:
+        x = layer(x)
+    return x
+
+
+def fc_layers(input):
     flat = Flatten()(input)
     hidden = Dense(10, activation='relu')(flat)
-    output = Dense(1, activation='sigmoid')(hidden)
+    output = Dense(1, activation='softmax')(hidden)
     print("train fully connected layers")
     return output
+
+def classifier_layers(autoencoder, autoencoderLayers, input):
+    #encoder_layers
+    x = encoder_layers(autoencoderModel, 10, input)
+    # fully connected layers
+    x = fc_layers(x)
+    return x
