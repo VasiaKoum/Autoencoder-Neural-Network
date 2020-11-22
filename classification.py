@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from functions import *
 
 # A part hyperparameters -> number of layers, filter size, number of filters/layer, number of epochs, batch size
-
+#python3 classification.py -d ./Datasets/train-images-idx3-ubyte -dl ./Datasets/train-labels-idx1-ubyte -t ./Datasets/t10k-images-idx3-ubyte -tl ./Datasets/t10k-labels-idx1-ubyte -model autoencoder
 
 def main():
     argcheck = []
@@ -23,13 +23,13 @@ def main():
             trainset = sys.argv[i+1]
         elif sys.argv[i] == "-dl":
             argcheck[1] = True
-            train_labels = sys.argv[i+1]
+            trainlabels = sys.argv[i+1]
         elif sys.argv[i] == "-t":
             argcheck[2] = True
             testset = sys.argv[i + 1]
         elif sys.argv[i] == "-tl":
             argcheck[3] = True
-            test_labels = sys.argv[i + 1]
+            testlabels = sys.argv[i + 1]
         elif sys.argv[i] == "-model":
             argcheck[4] = True
             autoencoder = sys.argv[i + 1]
@@ -37,43 +37,70 @@ def main():
         if argcheck[i] is False:
             sys.exit("Wrong or missing parameter. Please execute with –d <training set> –dl <traininglabels> -t <testset> -tl <test labels> -model <autoencoder h5>")
 
-    pixels, numarray = numpy_from_dataset(trainset, 4)
-    if len(numarray) != 4 or len(pixels) == 0:
+    train_pixels, train_numarray = numpy_from_dataset(trainset, 4)
+    train_pixels = np.reshape(train_pixels.astype('float32') / 255., (-1, train_numarray[2], train_numarray[3]))
+
+    train_labels, train_labels_numarray = numpy_from_dataset(trainlabels, 2)
+
+    test_pixels, test_numarray = numpy_from_dataset(testset, 4)
+    test_pixels = np.reshape(test_pixels.astype('float32') / 255., (-1, test_numarray[2], test_numarray[3]))
+
+    test_labels, test_labels_numarray = numpy_from_dataset(testlabels, 2)
+
+    if len(train_numarray) != 4 or len(train_pixels) == 0:
         sys.exit("Input dataset does not have the required number of values")
+    if len(train_labels_numarray) != 2 or len(train_labels) == 0:
+        sys.exit("Input dataset does not have the required number of values")
+    if len(test_numarray) != 4 or len(test_pixels) == 0:
+        sys.exit("Input dataset does not have the required number of values")
+    if len(test_labels_numarray) != 2 or len(test_labels) == 0:
+        sys.exit("Input dataset does not have the required number of values")
+
+    # train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
+
+    # print("train_X ", len(train_X[0]), len(train_X))
+    # print("numarray ", numarray[0], len(numarray))
+
+    #convert label set to boolean labels
+
+    print("Data ready in numpy array!\n")
+
     parameters = [4, 3, 8, 5, 100]
-    input_img = Input(shape=(numarray[2], numarray[3], 1))
+    newparameter = [[] for i in range(len(parameters))]
 
-    # encoding = Model(input_img, encoder(input_img, parameters))
-    # encoding.summary()
-    # print(encoding.layers)
+    while True:
+        input_img = Input(shape=(train_numarray[2], train_numarray[3], 1))
 
-    #load autoencoder
-    autoencoderModel = load_model(autoencoder)
-    #encoderModel.load_weights(autoencoder + ".h5")
-    autoencoderModel.compile(loss='mean_squared_error', optimizer=RMSprop())
-    autoencoderModel.summary()
+        # encoding = Model(input_img, encoder(input_img, parameters))
+        # encoding.summary()
+        # print(encoding.layers)
 
-    # create classifier Model
-    classifier = Model(inputs=input_img, outputs=classifier_layers(autoencoderModel, 10, input_img))
-    classifier.summary()
+        # load autoencoder
+        autoencoderModel = load_model(autoencoder)
+        autoencoderModel.load_weights(autoencoder + ".h5")
+        autoencoderModel.compile(loss='mean_squared_error', optimizer=RMSprop())
+        autoencoderModel.summary()
 
-    #classifier training
-    #classifier_train = classifier.fit()
+        # create classifier Model
+        classifier = Model(inputs=input_img,
+                           outputs=classifier_layers(autoencoderModel, count_half_layers(parameters[0]), input_img))
 
-    # while(True):
-        # print("Begin building model...")
-        # input_img = Input(shape=(numarray[2], numarray[3], 1))
-        # autoencoder = Model(input_img, decoder(encoder(input_img, 4, 32), 4, 32))
-        # autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
-        # autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=32, epochs=5,verbose=1,validation_data=(valid_X, valid_Y))
+        # for layer in classifier.layers[1:count_half_layers(parameters[0])]:
+        #     layer.trainable = False
 
-        # autoencoder = load_model("autoencoder")
-        # autoencoder.compile(loss='mean_squared_error', optimizer=RMSprop())
+        classifier.compile(loss='mean_squared_error', optimizer=RMSprop())
+        classifier.summary()
+
+        # classifier training
+        train_time = time.time()
+        classifier_train = classifier.fit(train_pixels, train_labels, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(test_pixels, test_labels))
+        train_time = time.time() - train_time
+        classifier.evaluate(test_pixels, test_labels, verbose=1)
 
         # User choices:
-        # parameters, continue_flag = user_choices(autoencoder, "autoencoder")
-        # if(not continue_flag):
-        #     break;
+        parameters, continue_flag = user_choices(classifier, classifier_train, parameters, train_time, newparameter)
+        if not continue_flag:
+            break
 
 start_time = time.time()
 main()

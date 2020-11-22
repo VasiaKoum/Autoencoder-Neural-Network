@@ -17,7 +17,9 @@ def numpy_from_dataset(inputpath, numbers):
             pixels = np.array(list(bytes_group(numarray[2]*numarray[3], file.read(), fillvalue=0)))
         elif numbers == 2:
             # FIX THIS
+            pixels = np.array(list(bytes_group(1, file.read(), fillvalue=0)))
             # pixels = np.array(list(bytes_group(rows*columns, file.read(), fillvalue=0)))
+
             print(numarray[0], " ", numarray[1])
     return pixels, numarray
 
@@ -148,21 +150,29 @@ def input_parameters():
 def encoder_layers(autoencoder, autoencoderLayers, input):
     encoderLayers = autoencoderLayers
     x = input
-    for layer in autoencoder.layers[0:encoderLayers]:
+    for layer in autoencoder.layers[1:encoderLayers]:
         x = layer(x)
     return x
 
 
 def fc_layers(input):
-    flat = Flatten()(input)
-    hidden = Dense(10, activation='relu')(flat)
-    output = Dense(1, activation='softmax')(hidden)
+    x = Flatten()(input)
+    x = Dense(32, activation='relu')(x)
+    #x = Dropout(0.2,input_shape=(28,))(x)
+    x = Dense(10, activation='softmax')(x)
     print("train fully connected layers")
-    return output
+    return x
+
 
 def classifier_layers(autoencoder, autoencoderLayers, input):
-    #encoder_layers
-    x = encoder_layers(autoencoderModel, 10, input)
+    # encoder_layers
+    x = encoder_layers(autoencoder, autoencoderLayers, input)
     # fully connected layers
     x = fc_layers(x)
     return x
+
+
+def count_half_layers(layers):
+    result = layers*3 - 1
+    print("layers of encoder:", result)
+    return result
