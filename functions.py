@@ -19,7 +19,6 @@ def numpy_from_dataset(inputpath, numbers):
             # FIX THIS
             pixels = np.array(list(bytes_group(1, file.read(), fillvalue=0)))
             # pixels = np.array(list(bytes_group(rows*columns, file.read(), fillvalue=0)))
-
             print(numarray[0], " ", numarray[1])
     return pixels, numarray
 
@@ -74,20 +73,64 @@ def load_model(modelname):
     autoencoder.load_weights(modelname+".h5")
     return autoencoder
 
-def error_graphs(modeltrain, parameters, train_time):
-    print(modeltrain.history['loss'][-1])
-    print(modeltrain.history['val_loss'][-1])
-    plt.plot(modeltrain.history['loss'], label='train')
-    plt.plot(modeltrain.history['val_loss'], label='test')
-    plt.title('Loss / Mean Squared Error in '+str(round(train_time, 3))+'sec')
-    plt.ylabel('Loss')
-    plt.xlabel('epoch')
-    plt.legend(['loss', 'val_loss'], loc='upper left')
-    graphname = "L"+str(parameters[0])+"_FS"+str(parameters[1])+"_FL"+str(parameters[2])+"_E"+str(parameters[3])+"_B"+str(parameters[4])+".png"
-    print("Save graph with name: ",graphname)
-    plt.savefig(graphname)
-    plt.show()
-    plt.close()
+def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, originparms):
+    loss = []
+    val = []
+    values = []
+    times = []
+    for i in range(len(newparameter)):
+        loss.clear()
+        val.clear()
+        times.clear()
+        values.clear()
+        for j in newparameter[i]:
+            values.append(j[0])
+            loss.append(j[1])
+            val.append(j[2])
+            times.append(j[3])
+        if (i == indexparm-1):
+            values.append(parameters[indexparm-1])
+            loss.append(modeltrain.history['loss'][-1])
+            val.append(modeltrain.history['val_loss'][-1])
+        if newparameter[i]:
+            graphname = name_parameter(originparms, i, True) + ".png"
+            plt.plot(values, loss, label='train', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
+            plt.plot(values, val, label='test', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
+            plt.title('Loss / Mean Squared Error in '+str(round(times[-1], 3))+'sec')
+            plt.ylabel('Loss')
+            plt.xlabel(name_parameter(originparms, i, False))
+            plt.legend(['loss', 'val_loss'], loc='upper left')
+            print("Save graph with name: ",graphname)
+            plt.savefig(graphname)
+            plt.show()
+            plt.close()
+    return
+
+def name_parameter(parameters, number, flag):
+    name = ""
+    if (flag):
+        if (number==0):
+            name = "Lx"+"_FS"+str(parameters[1])+"_FL"+str(parameters[2])+"_E"+str(parameters[3])+"_B"+str(parameters[4])
+        elif (number==1):
+            name = "L"+str(parameters[0])+"_FSx"+"_FL"+str(parameters[2])+"_E"+str(parameters[3])+"_B"+str(parameters[4])
+        elif (number==2):
+            name = "L"+str(parameters[0])+"_FS"+str(parameters[1])+"_FLx"+"_E"+str(parameters[3])+"_B"+str(parameters[4])
+        elif (number==3):
+            name = "L"+str(parameters[0])+"_FS"+str(parameters[1])+"_FL"+str(parameters[2])+"_Ex"+"_B"+str(parameters[4])
+        elif (number==4):
+            name = "L"+str(parameters[0])+"_FS"+str(parameters[1])+"_FL"+str(parameters[2])+"_E"+str(parameters[3])+"_Bx"
+    else:
+        if (number==0):
+            name = "Layers"
+        elif (number==1):
+            name = "Filter_Size"
+        elif (number==2):
+            name = "Filters/Layer"
+        elif (number==3):
+            name = "Epochs"
+        elif (number==4):
+            name = "Batch_Size"
+    return name
 
 def reshape_dataset(dataset, numarray):
     train_X, valid_X, train_Y, valid_Y = train_test_split(dataset, dataset, test_size=0.2, random_state=13)
@@ -98,40 +141,63 @@ def reshape_dataset(dataset, numarray):
     valid_Y = np.reshape(valid_Y.astype('float32') / 255., (-1, numarray[2], numarray[3]))
     return train_X, valid_X, train_Y, valid_Y
 
-def user_choices(model, modeltrain, parameters, train_time, newparameter):
+# def parameters_update(oldparm, indexparm, parameters, originparms, modeltrain, newparameter, changepar):
+#     tmpparm = oldparm
+#     if tmpparm<0:
+#         tmpparm = indexparm
+#     tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
+#     newparameter[tmpparm-1].append(tmp)
+#     parameters = originparms.copy()
+#     parameters[indexparm-1] = changepar
+#     oldparm = indexparm
+#     return newparameter, parameters, oldparm
+
+def user_choices(model, modeltrain, parameters, originparms, train_time, newparameter, oldparm):
     continue_flag = True
-    while(True):
+    while (True):
         try:
             run_again = int(input("\nUSER CHOICES: choose one from below options(1-4): \n1)Execute program with different hyperparameter\n2)Show error-graphs\n3)Save the existing model\n4)Exit\n---------------> "))
         except:
             print("Invalid choice.Try again\n")
-        if(run_again==1):
+        if (run_again==1):
             try:
-                indexpar = int(input("Choose what parameter would like to change (options 1-5): \n1)Layers\n2)Filter size\n3)Filters/Layer\n4)Epochs\n5)Batch size\n---------------> "))
+                indexparm = int(input("Choose what parameter would like to change (options 1-5): \n1)Layers\n2)Filter size\n3)Filters/Layer\n4)Epochs\n5)Batch size\n---------------> "))
             except:
                 print("Invalid choice.Try again\n")
             # FIX THIS
-            if(indexpar>=1 and indexpar<=5):
-                message = "Number for this parameter is "+str(parameters[indexpar-1])+". Type the new number: "
-                changepar = int(input("Number for this parameter is "+str(parameters[indexpar-1])+". Type the new number: "))
-                tmp = parameters + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
-                newparameter[indexpar-1].append(tmp)
-                print(np.matrix(newparameter))
-                parameters[indexpar-1] = changepar
+            if (indexparm>=1 and indexparm<=5):
+                try:
+                    changepar = int(input("Number for "+ name_parameter(parameters, indexparm-1, False) +" is "+str(parameters[indexparm-1])+". Type the new number: "))
+                except:
+                    print("Invalid choice.Try again\n")
+                    break
+                tmpparm = oldparm
+                if tmpparm<0:
+                    tmpparm = indexparm
+                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [train_time]
+                newparameter[tmpparm-1].append(tmp)
+                parameters = originparms.copy()
+                parameters[indexparm-1] = changepar
+                oldparm = indexparm
+                # newparameter, parameters, oldparm = parameters_update(oldparm, indexparm, parameters, originparms, modeltrain, newparameter, changepar)
                 break;
             else:
                 print("Invalid choice.Try again\n")
-        elif(run_again == 2):
-            error_graphs(modeltrain, parameters, train_time)
-        elif(run_again == 3):
+        elif (run_again == 2):
+            error_graphs(modeltrain, parameters, train_time, newparameter, oldparm, originparms)
+            continue_flag = False
+            break
+        elif (run_again == 3):
             save_model(model)
-        elif(run_again == 4):
+            continue_flag = False
+            break
+        elif (run_again == 4):
             continue_flag = False
             print("Program terminates...\n")
             break
         else:
             print("Invalid choice.Try again\n")
-    return parameters, continue_flag;
+    return parameters, continue_flag, oldparm;
 
 def input_parameters():
     parameters = []

@@ -10,15 +10,16 @@ from functions import *
 
 # Autoencoder hyperparameters -> number of layers, filter size, number of filters/layer, number of epochs, batch size
 def main():
-    if(len(sys.argv) != 3):
+    if (len(sys.argv) != 3):
         sys.exit("Wrong or missing parameter. Please execute with: -d dataset")
-    if(sys.argv[1] != "-d"):
+    if (sys.argv[1] != "-d"):
         sys.exit("Wrong or missing parameter. Please execute with: -d dataset")
     dataset = sys.argv[2]
 
     # numarray[0] -> magic_number, [1] -> images, [2] -> rows, [3] -> columns
+    # print(numarray[2], numarray[3])
     pixels, numarray = numpy_from_dataset(dataset, 4)
-    if(len(numarray)!=4 or len(pixels)==0):
+    if (len(numarray)!=4 or len(pixels)==0):
         sys.exit("Input dataset does not have the required number of values")
     train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
     print("Data ready in numpy array!\n")
@@ -26,8 +27,10 @@ def main():
     parameters = [4, 3, 6, 2, 2000]
     # parameters = input_parameters()
     newparameter = [[] for i in range(len(parameters))]
+    originparms = parameters.copy()
+    oldparm = -1
 
-    while(True):
+    while (True):
         print("\nBegin building model...")
         input_img = Input(shape=(numarray[2], numarray[3], 1))
         autoencoder = Model(input_img, decoder(encoder(input_img, parameters), parameters))
@@ -39,8 +42,8 @@ def main():
         # print(train_ER)
 
         # User choices:
-        parameters, continue_flag = user_choices(autoencoder, autoencoder_train, parameters, train_time, newparameter)
-        if(not continue_flag):
+        parameters, continue_flag, oldparm = user_choices(autoencoder, autoencoder_train, parameters, originparms, train_time, newparameter, oldparm)
+        if (not continue_flag):
             break;
 
 start_time = time.time()
