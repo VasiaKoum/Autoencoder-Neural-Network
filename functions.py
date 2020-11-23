@@ -242,3 +242,17 @@ def count_half_layers(layers):
     result = layers*3 - 1
     print("layers of encoder:", result)
     return result
+
+
+def labels_to_binary(labels, range):
+    binary_labels = []
+    for i, label in enumerate(labels, start=0):
+        temp = []
+        for j in range(0, label[0]):
+            temp.append(0)
+        temp.append(1)
+        for z in range(0, range - label[0] - 1):
+            temp.append(0)
+        binary_labels.append(temp)
+    binary_labels = np.array(binary_labels)
+    return binary_labels

@@ -41,11 +41,39 @@ def main():
     train_pixels = np.reshape(train_pixels.astype('float32') / 255., (-1, train_numarray[2], train_numarray[3]))
 
     train_labels, train_labels_numarray = numpy_from_dataset(trainlabels, 2)
-
+    print(len(train_labels),train_labels[0])
     test_pixels, test_numarray = numpy_from_dataset(testset, 4)
     test_pixels = np.reshape(test_pixels.astype('float32') / 255., (-1, test_numarray[2], test_numarray[3]))
 
     test_labels, test_labels_numarray = numpy_from_dataset(testlabels, 2)
+
+    # binary_train_label = []
+    # for i, label in enumerate(train_labels, start=0):
+    #     temp = []
+    #     for j in range(0,label[0]):
+    #         temp.append(0)
+    #     temp.append(1)
+    #     for z in range(0,10 - label[0] -1):
+    #         temp.append(0)
+    #     binary_train_label.append(temp)
+    # binary_train_label = np.array(binary_train_label)
+    #
+    # binary_test_label = []
+    # for i, label in enumerate(test_labels, start=0):
+    #     temp = []
+    #     for j in range(0, label[0]):
+    #         temp.append(0)
+    #     temp.append(1)
+    #     for z in range(0, 10 - label[0] -1):
+    #         temp.append(0)
+    #     binary_test_label.append(temp)
+    # binary_test_label = np.array(binary_test_label)
+    binary_train_label = labels_to_binary(train_labels, 10)
+    binary_test_label = labels_to_binary(test_labels, 10)
+
+    print(binary_train_label[0], binary_train_label.shape, train_labels[0])
+    # test_labels = np.reshape(test_labels.astype('float32') / 255., (-1, test_labels_numarray[1], 10))
+    # train_labels = np.reshape(train_labels.astype('float32') / 255., (-1,train_labels_numarray[1], 10))
 
     if len(train_numarray) != 4 or len(train_pixels) == 0:
         sys.exit("Input dataset does not have the required number of values")
@@ -65,7 +93,7 @@ def main():
 
     print("Data ready in numpy array!\n")
 
-    parameters = [4, 3, 8, 5, 100]
+    parameters = [4, 3, 32, 200, 80]
     newparameter = [[] for i in range(len(parameters))]
 
     while True:
@@ -93,9 +121,9 @@ def main():
 
         # classifier training
         train_time = time.time()
-        classifier_train = classifier.fit(train_pixels, train_labels, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(test_pixels, test_labels))
+        classifier_train = classifier.fit(train_pixels, binary_train_label, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(test_pixels, binary_test_label))
         train_time = time.time() - train_time
-        classifier.evaluate(test_pixels, test_labels, verbose=1)
+        classifier.evaluate(test_pixels, binary_test_label, verbose=1)
 
         # User choices:
         parameters, continue_flag = user_choices(classifier, classifier_train, parameters, train_time, newparameter)
