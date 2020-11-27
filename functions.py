@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import zip_longest
 from sklearn.model_selection import train_test_split
@@ -35,7 +36,7 @@ def encoder(input_img, parameters):
         conv = BatchNormalization()(conv)
         if (i<2):
             conv = MaxPooling2D(pool_size=(2,2))(conv)
-        conv = Dropout(0.2)(conv)
+        # conv = Dropout(0.2)(conv)
         filters*=2
     return conv
 
@@ -52,7 +53,7 @@ def decoder(conv, parameters):
     conv = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(conv)
     return conv
 
-def save_model(model, modelname):
+def save_model(model):
     modelname = input("Type the name for model(without extension eg.h5): ")
     print("Saving Model: "+modelname+".json & "+modelname+".h5...")
     # Save model in JSON file
@@ -73,7 +74,7 @@ def load_model(modelname):
     autoencoder.load_weights(modelname+".h5")
     return autoencoder
 
-def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, originparms):
+def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, originparms, hypernames):
     loss = []
     val = []
     values = []
@@ -92,13 +93,14 @@ def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, or
             values.append(parameters[indexparm-1])
             loss.append(modeltrain.history['loss'][-1])
             val.append(modeltrain.history['val_loss'][-1])
+            times.append(train_time)
         if newparameter[i]:
-            graphname = name_parameter(originparms, i, True) + ".png"
+            graphname = name_parameter(originparms, i, True, hypernames) + ".png"
             plt.plot(values, loss, label='train', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
             plt.plot(values, val, label='test', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
             plt.title('Loss / Mean Squared Error in '+str(round(times[-1], 3))+'sec')
             plt.ylabel('Loss')
-            plt.xlabel(name_parameter(originparms, i, False))
+            plt.xlabel(name_parameter(originparms, i, False, hypernames))
             plt.legend(['loss', 'val_loss'], loc='upper left')
             print("Save graph with name: ",graphname)
             plt.savefig(graphname)
@@ -106,7 +108,7 @@ def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, or
             plt.close()
     return
 
-def name_parameter(parameters, number, flag):
+def name_parameter(parameters, number, flag, hypernames):
     name = ""
     if (flag):
         if (number==0):
@@ -120,16 +122,7 @@ def name_parameter(parameters, number, flag):
         elif (number==4):
             name = "L"+str(parameters[0])+"_FS"+str(parameters[1])+"_FL"+str(parameters[2])+"_E"+str(parameters[3])+"_Bx"
     else:
-        if (number==0):
-            name = "Layers"
-        elif (number==1):
-            name = "Filter_Size"
-        elif (number==2):
-            name = "Filters/Layer"
-        elif (number==3):
-            name = "Epochs"
-        elif (number==4):
-            name = "Batch_Size"
+        name = hypernames[number]
     return name
 
 def reshape_dataset(dataset, numarray):
@@ -141,57 +134,51 @@ def reshape_dataset(dataset, numarray):
     valid_Y = np.reshape(valid_Y.astype('float32') / 255., (-1, numarray[2], numarray[3]))
     return train_X, valid_X, train_Y, valid_Y
 
-# def parameters_update(oldparm, indexparm, parameters, originparms, modeltrain, newparameter, changepar):
-#     tmpparm = oldparm
-#     if tmpparm<0:
-#         tmpparm = indexparm
-#     tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
-#     newparameter[tmpparm-1].append(tmp)
-#     parameters = originparms.copy()
-#     parameters[indexparm-1] = changepar
-#     oldparm = indexparm
-#     return newparameter, parameters, oldparm
-
-def user_choices(model, modeltrain, parameters, originparms, train_time, newparameter, oldparm):
+def user_choices(model, modeltrain, parameters, originparms, train_time, newparameter, oldparm, df, hypernames):
     continue_flag = True
     while (True):
         try:
             run_again = int(input("\nUSER CHOICES: choose one from below options(1-4): \n1)Execute program with different hyperparameter\n2)Show error-graphs\n3)Save the existing model\n4)Exit\n---------------> "))
         except:
             print("Invalid choice.Try again\n")
+            continue
         if (run_again==1):
             try:
                 indexparm = int(input("Choose what parameter would like to change (options 1-5): \n1)Layers\n2)Filter size\n3)Filters/Layer\n4)Epochs\n5)Batch size\n---------------> "))
             except:
                 print("Invalid choice.Try again\n")
-            # FIX THIS
+                continue
             if (indexparm>=1 and indexparm<=5):
                 try:
-                    changepar = int(input("Number for "+ name_parameter(parameters, indexparm-1, False) +" is "+str(parameters[indexparm-1])+". Type the new number: "))
+                    changepar = int(input("Number for "+ name_parameter(parameters, indexparm-1, False, hypernames) +" is "+str(parameters[indexparm-1])+". Type the new number: "))
                 except:
                     print("Invalid choice.Try again\n")
-                    break
+                    continue
                 tmpparm = oldparm
                 if tmpparm<0:
                     tmpparm = indexparm
                 tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [train_time]
                 newparameter[tmpparm-1].append(tmp)
+                df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
                 parameters = originparms.copy()
                 parameters[indexparm-1] = changepar
                 oldparm = indexparm
-                # newparameter, parameters, oldparm = parameters_update(oldparm, indexparm, parameters, originparms, modeltrain, newparameter, changepar)
-                break;
+                break
             else:
                 print("Invalid choice.Try again\n")
         elif (run_again == 2):
-            error_graphs(modeltrain, parameters, train_time, newparameter, oldparm, originparms)
-            continue_flag = False
-            break
+            error_graphs(modeltrain, parameters, train_time, newparameter, oldparm, originparms, hypernames)
+            # continue_flag = False
+            # break
         elif (run_again == 3):
             save_model(model)
-            continue_flag = False
-            break
+            # continue_flag = False
+            # break
         elif (run_again == 4):
+            df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
+            df.drop_duplicates(subset=['Layers', 'Filter_Size', 'Filters/Layer', 'Epochs', 'Batch_Size'], inplace=True)
+            df = df.sort_values(by = 'Loss', ascending=True)
+            df.to_csv('loss_values.csv', sep='\t', index=False)
             continue_flag = False
             print("Program terminates...\n")
             break
@@ -210,6 +197,14 @@ def input_parameters():
     except:
         print("Invalid choice.Try again\n")
     return parameters
+
+def values_df():
+    try:
+        df = pd.read_csv('loss_values.csv',sep='\t')
+    except:
+        loss_values = {'Layers': [], 'Filter_Size': [], 'Filters/Layer': [], 'Epochs': [], 'Batch_Size': [], 'Train_Time': [], 'Loss': [], 'Val_Loss': []}
+        df = pd.DataFrame(data=loss_values)
+    return df
 
 
 
