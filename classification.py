@@ -47,29 +47,11 @@ def main():
 
     test_labels, test_labels_numarray = numpy_from_dataset(testlabels, 2)
 
-    # binary_train_label = []
-    # for i, label in enumerate(train_labels, start=0):
-    #     temp = []
-    #     for j in range(0,label[0]):
-    #         temp.append(0)
-    #     temp.append(1)
-    #     for z in range(0,10 - label[0] -1):
-    #         temp.append(0)
-    #     binary_train_label.append(temp)
-    # binary_train_label = np.array(binary_train_label)
-    #
-    # binary_test_label = []
-    # for i, label in enumerate(test_labels, start=0):
-    #     temp = []
-    #     for j in range(0, label[0]):
-    #         temp.append(0)
-    #     temp.append(1)
-    #     for z in range(0, 10 - label[0] -1):
-    #         temp.append(0)
-    #     binary_test_label.append(temp)
-    # binary_test_label = np.array(binary_test_label)
     binary_train_label = labels_to_binary(train_labels, 10)
     binary_test_label = labels_to_binary(test_labels, 10)
+
+    train_X, valid_X, train_label, valid_label = train_test_split(train_pixels, binary_train_label, test_size=0.2,
+                                                                  random_state=13)
 
     print(binary_train_label[0], binary_train_label.shape, train_labels[0])
     # test_labels = np.reshape(test_labels.astype('float32') / 255., (-1, test_labels_numarray[1], 10))
@@ -113,17 +95,33 @@ def main():
         classifier = Model(inputs=input_img,
                            outputs=classifier_layers(autoencoderModel, count_half_layers(parameters[0]), input_img))
 
-        # for layer in classifier.layers[1:count_half_layers(parameters[0])]:
-        #     layer.trainable = False
+        for layer in classifier.layers[1:count_half_layers(parameters[0])]:
+            layer.trainable = False
 
         classifier.compile(loss='mean_squared_error', optimizer=RMSprop())
         classifier.summary()
 
         # classifier training
         train_time = time.time()
-        classifier_train = classifier.fit(train_pixels, binary_train_label, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(test_pixels, binary_test_label))
+
+        classifier_train = classifier.fit(train_X, train_label, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(valid_X, valid_label))
+        classifier.save_weights('first_part_classification.h5')
+
+        for layer in classifier.layers[1:count_half_layers(parameters[0])]:
+            layer.trainable = True
+
+        classifier.compile(loss='mean_squared_error', optimizer=RMSprop())
+        classifier_train = classifier.fit(train_X, train_label, batch_size=parameters[4], epochs=parameters[3],
+                                          verbose=1, validation_data=(valid_X, valid_label))
+        classifier.save_weights('classification.h5')
+
+        eval = classifier.evaluate(test_pixels, binary_test_label, verbose=1)
+        print('|test| loss: ', eval, 'accuracy: ', eval)
+
+        predicted = classifier.predict(test_pixels)
+        print(predicted)
+
         train_time = time.time() - train_time
-        classifier.evaluate(test_pixels, binary_test_label, verbose=1)
 
         # User choices:
         parameters, continue_flag = user_choices(classifier, classifier_train, parameters, train_time, newparameter)
