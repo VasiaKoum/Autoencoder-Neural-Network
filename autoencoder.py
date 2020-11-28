@@ -25,7 +25,7 @@ def main():
     train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
     print("Data ready in numpy array!\n")
     # Layers, Filter_size, Filters/Layer, Epochs, Batch_size
-    parameters = [4, 3, 8, 2, 1000]
+    parameters = [4, 3, 16, 100, 64]
     # parameters = input_parameters()
     newparameter = [[] for i in range(len(parameters))]
     originparms = parameters.copy()

@@ -177,7 +177,7 @@ def user_choices(model, modeltrain, parameters, originparms, train_time, newpara
         elif (run_again == 4):
             df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
             df.drop_duplicates(subset=['Layers', 'Filter_Size', 'Filters/Layer', 'Epochs', 'Batch_Size'], inplace=True)
-            df = df.sort_values(by = 'Loss', ascending=True)
+            df = df.sort_values(by = 'Val_Loss', ascending=True)
             df.to_csv('loss_values.csv', sep='\t', index=False)
             continue_flag = False
             print("Program terminates...\n")
