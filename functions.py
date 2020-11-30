@@ -22,7 +22,7 @@ def numpy_from_dataset(inputpath, numbers):
             # FIX THIS
             pixels = np.array(list(bytes_group(1, file.read(), fillvalue=0)))
             # pixels = np.array(list(bytes_group(rows*columns, file.read(), fillvalue=0)))
-            print(numarray[0], " ", numarray[1])
+            #print(numarray[0], " ", numarray[1])
     return pixels, numarray
 
 def bytes_group(n, iterable, fillvalue=None):
@@ -113,31 +113,49 @@ def error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, or
 def classificattion_error_graphs(modeltrain, parameters, train_time, newparameter, indexparm, originparms, hypernames):
     loss = []
     val = []
+    acc = []
+    val_acc = []
     values = []
     times = []
     for i in range(len(newparameter)):
         loss.clear()
         val.clear()
+        acc.clear()
+        val_acc.clear()
         times.clear()
         values.clear()
         for j in newparameter[i]:
             values.append(j[0])
             loss.append(j[1])
             val.append(j[2])
-            times.append(j[3])
+            acc.append(j[3])
+            val_acc.append(j[4])
+            times.append(j[5])
         if (i == indexparm-1):
             values.append(parameters[indexparm-1])
             loss.append(modeltrain.history['loss'][-1])
             val.append(modeltrain.history['val_loss'][-1])
+            acc.append(modeltrain.history['accuracy'][-1])
+            val_acc.append(modeltrain.history['val_accuracy'][-1])
             times.append(train_time)
         if newparameter[i]:
             graphname = classification_name_parameter(originparms, i, True, hypernames) + ".png"
+            plt.subplot(2, 1, 1)
             plt.plot(values, loss, label='train', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
             plt.plot(values, val, label='test', linestyle='dashed', linewidth = 3,  marker='o', markersize=9)
             plt.title('Loss / Mean Squared Error in '+str(round(times[-1], 3))+'sec')
             plt.ylabel('Loss')
             plt.xlabel(classification_name_parameter(originparms, i, False, hypernames))
             plt.legend(['loss', 'val_loss'], loc='upper left')
+
+            plt.subplot(2, 1, 2)
+            plt.plot(values, acc, label='train', linestyle='dashed', linewidth=3, marker='o', markersize=9)
+            plt.plot(values, val_acc, label='test', linestyle='dashed', linewidth=3, marker='o', markersize=9)
+            plt.title('Accuracy in ' + str(round(times[-1], 3)) + 'sec')
+            plt.ylabel('Accuracy')
+            plt.xlabel(classification_name_parameter(originparms, i, False, hypernames))
+            plt.legend(['accuracy', 'val_accuracy'], loc='upper left')
+            plt.tight_layout()
             print("Save graph with name: ",graphname)
             plt.savefig(graphname)
             plt.show()
@@ -208,7 +226,7 @@ def user_choices(model, modeltrain, parameters, originparms, train_time, newpara
                 tmpparm = oldparm
                 if tmpparm<0:
                     tmpparm = indexparm
-                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [train_time]
+                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] +  [train_time]
                 newparameter[tmpparm-1].append(tmp)
                 df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
                 parameters = originparms.copy()
@@ -247,7 +265,7 @@ def user_choices_classification(model, modeltrain, parameters, originparms, trai
             continue
         if (run_again==1):
             try:
-                indexparm = int(input("Choose what parameter would like to change (options 1-5): \n1)Layers\n2)Fc_units\n4)Epochs\n5)Batch size\n---------------> "))
+                indexparm = int(input("Choose what parameter would like to change (options 1-4): \n1)Layers\n2)Fc_units\n3)Epochs\n4)Batch size\n---------------> "))
             except:
                 print("Invalid choice.Try again\n")
                 continue
@@ -261,9 +279,9 @@ def user_choices_classification(model, modeltrain, parameters, originparms, trai
                 tmpparm = oldparm
                 if tmpparm<0:
                     tmpparm = indexparm
-                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [train_time]
+                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [modeltrain.history['accuracy'][-1]] + [modeltrain.history['val_accuracy'][-1]] + [train_time]
                 newparameter[tmpparm-1].append(tmp)
-                df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
+                df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [modeltrain.history['accuracy'][-1]] + [modeltrain.history['val_accuracy'][-1]]
                 parameters = originparms.copy()
                 parameters[indexparm-1] = changepar
                 oldparm = indexparm
@@ -281,8 +299,8 @@ def user_choices_classification(model, modeltrain, parameters, originparms, trai
             # continue_flag = False
             # break
         elif (run_again == 4):
-            df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
-            df.drop_duplicates(subset=['Layers', 'fc_units', 'Epochs', 'Batch_Size'], inplace=True)
+            df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [modeltrain.history['accuracy'][-1]] + [modeltrain.history['val_accuracy'][-1]]
+            df.drop_duplicates(subset=['Layers', 'Fc_units', 'Epochs', 'Batch_Size'], inplace=True)
             df = df.sort_values(by = 'Loss', ascending=True)
             df.to_csv('loss_values.csv', sep='\t', index=False)
             continue_flag = False
@@ -327,7 +345,7 @@ def classification_values_df():
     try:
         df = pd.read_csv('classification_loss_values.csv',sep='\t')
     except:
-        loss_values = {'Layers': [], 'fc_units': [], 'Epochs': [], 'Batch_Size': [], 'Train_Time': [], 'Loss': [], 'Val_Loss': []}
+        loss_values = {'Layers': [], 'Fc_units': [], 'Epochs': [], 'Batch_Size': [], 'Train_Time': [], 'Loss': [], 'Val_Loss': [], 'Accuracy': [], 'Val_Accuracy': []}
         df = pd.DataFrame(data=loss_values)
     return df
 
@@ -407,6 +425,12 @@ def correct_predictions(test_pixels, test_labels, predicted_labels, first_wrong_
             plt.title('Predicted ' + str(predicted_labels[i]) + ', Class ' + str(test_labels[i]))
             count = count + 1
             first_wrong_num = first_wrong_num - 1
+
+
+def print_predictions_numbers(test_labels, predicted_labels):
+    correct_labels = (test_labels != predicted_labels)
+    print('Found ', len(test_labels) - np.count_nonzero(correct_labels == True), ' correct labels')
+    print('Found ', np.count_nonzero(correct_labels == True), ' incorrect labels')
 
 
 def training_plots(model):

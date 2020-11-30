@@ -61,7 +61,7 @@ def main():
 
     train_X, valid_X, train_label, valid_label = train_test_split(train_pixels, binary_train_label, test_size=0.2, random_state=13)
 
-    print("Original label: 5", train_labels[0])
+    print("Original label: ", train_labels[0])
     print('After conversion to one-hot: ', binary_train_label[0])
 
     if len(train_numarray) != 4 or len(train_pixels) == 0:
@@ -78,7 +78,7 @@ def main():
     print("Data ready in numpy array!\n")
     df = classification_values_df()
     hypernames = ["Layers", "Fc_units", "Epochs", "Batch_Size"]
-    parameters = [4, 64, 1, 80]
+    parameters = [4, 64, 200, 80]
     #parameters = classification_input_parameters()
     newparameter = [[] for i in range(len(parameters))]
     originparms = parameters.copy()
@@ -132,6 +132,7 @@ def main():
             temp.append(np.argmax(array))
         predicted_labels = np.array(temp)
 
+        print_predictions_numbers(test_labels, predicted_labels)
         print(classification_report(test_labels, predicted_labels))
 
         train_time = time.time() - train_time
