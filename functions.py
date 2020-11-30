@@ -255,7 +255,7 @@ def user_choices(model, modeltrain, parameters, originparms, train_time, newpara
             print("Invalid choice.Try again\n")
     return parameters, continue_flag, oldparm;
 
-def user_choices_classification(model, modeltrain, parameters, originparms, train_time, newparameter, oldparm, df, hypernames, test_pixels, test_labels):
+def user_choices_classification(model, modeltrain, parameters, originparms, train_time, newparameter, oldparm, df, hypernames, test_pixels, test_labels, predicted_labels):
     continue_flag = True
     while (True):
         try:

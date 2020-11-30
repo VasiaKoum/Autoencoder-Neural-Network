@@ -78,15 +78,17 @@ def main():
     print("Data ready in numpy array!\n")
     df = classification_values_df()
     hypernames = ["Layers", "Fc_units", "Epochs", "Batch_Size"]
-    parameters = [4, 64, 200, 80]
+    parameters = [4, 32, 20, 64]
     #parameters = classification_input_parameters()
     newparameter = [[] for i in range(len(parameters))]
     originparms = parameters.copy()
     oldparm = -1
-
+    layers_check = parameters[0]
     while True:
         input_img = Input(shape=(train_numarray[2], train_numarray[3], 1))
-
+        if parameters[0] != layers_check:
+            layers_check = parameters[0]
+            autoencoder = input("Type new autoencoder with the same layers: ")
         # load autoencoder
         autoencoderModel = load_model(autoencoder)
         autoencoderModel.load_weights(autoencoder + ".h5")
@@ -138,7 +140,7 @@ def main():
         train_time = time.time() - train_time
 
         # User choices:
-        parameters, continue_flag, oldparm = user_choices_classification(classifier, classifier_train, parameters, originparms, train_time, newparameter, oldparm,df,hypernames, test_pixels, test_labels)
+        parameters, continue_flag, oldparm = user_choices_classification(classifier, classifier_train, parameters, originparms, train_time, newparameter, oldparm,df,hypernames, test_pixels, test_labels, predicted_labels)
         if not continue_flag:
             break
 
