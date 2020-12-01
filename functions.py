@@ -302,7 +302,7 @@ def user_choices_classification(model, modeltrain, parameters, originparms, trai
             df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [modeltrain.history['accuracy'][-1]] + [modeltrain.history['val_accuracy'][-1]]
             df.drop_duplicates(subset=['Layers', 'Fc_units', 'Epochs', 'Batch_Size'], inplace=True)
             df = df.sort_values(by = 'Loss', ascending=True)
-            df.to_csv('loss_values.csv', sep='\t', index=False)
+            df.to_csv('classification_loss_values.csv', sep='\t', index=False)
             continue_flag = False
             print("Program terminates...\n")
             break
