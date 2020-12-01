@@ -25,8 +25,7 @@ def main():
     train_X, valid_X, train_Y, valid_Y = reshape_dataset(pixels, numarray)
     print("Data ready in numpy array!\n")
     # Layers, Filter_size, Filters/Layer, Epochs, Batch_size
-    parameters = [4, 3, 16, 100, 64]
-    # parameters = input_parameters()
+    parameters = input_parameters()
     newparameter = [[] for i in range(len(parameters))]
     originparms = parameters.copy()
     oldparm = -1
@@ -39,7 +38,7 @@ def main():
         train_time = time.time()
         autoencoder_train = autoencoder.fit(train_X, train_Y, batch_size=parameters[4], epochs=parameters[3], verbose=1, validation_data=(valid_X, valid_Y))
         train_time = time.time() - train_time
-        # train_ER = autoencoder.evaluate(train_X, train_Y, verbose=1)
+        print(autoencoder.summary())
 
         # User choices:
         parameters, continue_flag, oldparm = user_choices(autoencoder, autoencoder_train, parameters, originparms, train_time, newparameter, oldparm, df, hypernames)

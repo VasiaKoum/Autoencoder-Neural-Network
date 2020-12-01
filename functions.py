@@ -19,10 +19,7 @@ def numpy_from_dataset(inputpath, numbers):
         if numbers == 4:
             pixels = np.array(list(bytes_group(numarray[2]*numarray[3], file.read(), fillvalue=0)))
         elif numbers == 2:
-            # FIX THIS
             pixels = np.array(list(bytes_group(1, file.read(), fillvalue=0)))
-            # pixels = np.array(list(bytes_group(rows*columns, file.read(), fillvalue=0)))
-            #print(numarray[0], " ", numarray[1])
     return pixels, numarray
 
 def bytes_group(n, iterable, fillvalue=None):
@@ -52,7 +49,7 @@ def decoder(conv, parameters):
         if (i>=layers-2):
             conv = UpSampling2D((2,2))(conv)
         filters/=2
-    conv = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(conv)
+    conv = Conv2D(1, (filter_size, filter_size), activation='sigmoid', padding='same')(conv)
     return conv
 
 def save_model(model):
@@ -226,7 +223,7 @@ def user_choices(model, modeltrain, parameters, originparms, train_time, newpara
                 tmpparm = oldparm
                 if tmpparm<0:
                     tmpparm = indexparm
-                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] +  [train_time]
+                tmp = [parameters[tmpparm-1]] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [train_time]
                 newparameter[tmpparm-1].append(tmp)
                 df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]]
                 parameters = originparms.copy()
@@ -301,7 +298,7 @@ def user_choices_classification(model, modeltrain, parameters, originparms, trai
         elif (run_again == 4):
             df.loc[len(df), :] = parameters + [train_time] + [modeltrain.history['loss'][-1]] + [modeltrain.history['val_loss'][-1]] + [modeltrain.history['accuracy'][-1]] + [modeltrain.history['val_accuracy'][-1]]
             df.drop_duplicates(subset=['Layers', 'Fc_units', 'Epochs', 'Batch_Size'], inplace=True)
-            df = df.sort_values(by = 'Loss', ascending=True)
+            df = df.sort_values(by = 'Val_Accuracy', ascending=False)
             df.to_csv('classification_loss_values.csv', sep='\t', index=False)
             continue_flag = False
             print("Program terminates...\n")
