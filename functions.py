@@ -375,7 +375,7 @@ def classifier_layers(autoencoder, autoencoderLayers, fully_connected_num, input
 
 def count_half_layers(layers):
     result = layers*2 + 2 + 1
-    print("layers of encoder:", result)
+    #print("layers of encoder:", result)
     return result
 
 

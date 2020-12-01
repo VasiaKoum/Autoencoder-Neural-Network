@@ -78,8 +78,8 @@ def main():
     print("Data ready in numpy array!\n")
     df = classification_values_df()
     hypernames = ["Layers", "Fc_units", "Epochs", "Batch_Size"]
-    parameters = [4, 32, 20, 64]
-    #parameters = classification_input_parameters()
+    #parameters = [4, 32, 20, 64]
+    parameters = classification_input_parameters()
     newparameter = [[] for i in range(len(parameters))]
     originparms = parameters.copy()
     oldparm = -1
