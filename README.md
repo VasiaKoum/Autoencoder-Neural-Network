@@ -3,7 +3,7 @@
 Assignment for lesson: [`Software Development for Algorithmic Problems`](https://www.di.uoa.gr/en/studies/undergraduate/261) (DI University of Athens)
 
 ## Authors:
-[Vasiliki Koumarela](https://github.com/VasiaKoum)
+[Vasiliki Koumarela](https://github.com/VasiaKoum) <br>
 [Charalampos Katimertzis](https://github.com/chariskms)
 
 ## Parts
@@ -42,6 +42,7 @@ reduction of convergence time.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Part 1
+![image_part1](https://user-images.githubusercontent.com/44468438/108233685-b569e000-714c-11eb-8808-5d8e6f2da4a6.jpg) <br>
 The model was trained with a subset of 60k of black and white images of
 digits. The encoder for one layer uses **Conv2D** , **BatchNormalization** and
 **MaxPooling2D** (for the first 2 layers). Respectively, the decoder uses Conv2D,
@@ -123,12 +124,16 @@ decreasing and respectively as we decrease the Batch_Size, the values for
 losses are decreasing, as well. From loss_values.csv, we observe that the
 Layers and Filters/Layer affect negatively training time and the deeper the
 CNN, the higher are the loss values. Finally, Dropout layer isn’t required
-because the model isn’t overfitting eg: <br>
-**With Dropout: No Dropout:**
+because the model isn’t overfitting eg: 
+
+**With Dropout**             |  **No Dropout:**
+:-------------------------:|:-------------------------:
+![imageDropout](https://user-images.githubusercontent.com/44468438/108234084-20b3b200-714d-11eb-84c2-043a8522aed7.png)  |  ![imageNoDropout](https://user-images.githubusercontent.com/44468438/108234082-201b1b80-714d-11eb-9fd0-f1ff007d8b09.png)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Part 2
+<img src="https://user-images.githubusercontent.com/44468438/108233688-b6027680-714c-11eb-8204-3e296d8e5b41.png" width="55%" height="55%"> <br>
 The classification model splits in two parts. In the first part, we use the
 encoder with the trained weights from the autoencoder which we have
 already trained. The encoding part encodes the test data in order to make the
