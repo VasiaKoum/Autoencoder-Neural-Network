@@ -170,15 +170,15 @@ We executed the classification.py with optimized autoencoder model **L4_FS3_FL32
   **● L4_FCx_E20_B64:** <br>
   ![image12](https://user-images.githubusercontent.com/44468438/108236052-24e0cf00-714f-11eb-9b4f-ffe2c4ac7073.png)<br>
   **For the training with Fc units 256:** <br>
-  ![image3](https://user-images.githubusercontent.com/44468438/108235384-72107100-714e-11eb-85b9-58befa2e3a75.jpg)<br>
+  <img src="https://user-images.githubusercontent.com/44468438/108235384-72107100-714e-11eb-85b9-58befa2e3a75.jpg" width="90%" height="90%"> <br>
   **● L4_FC32_E20_Bx:** <br>
   ![image13](https://user-images.githubusercontent.com/44468438/108236054-25796580-714f-11eb-8370-ed404fd41432.png)<br>
   **For the training with Batch size 512:** <br>
-  ![image5](https://user-images.githubusercontent.com/44468438/108235404-76d52500-714e-11eb-810b-a34ecfbe36f2.jpg)<br>
+  <img src="https://user-images.githubusercontent.com/44468438/108235404-76d52500-714e-11eb-810b-a34ecfbe36f2.jpg" width="90%" height="90%"> <br>
   **● Lx_FC32_E20_Bx:** <br>
   ![image14](https://user-images.githubusercontent.com/44468438/108236057-25796580-714f-11eb-8b99-b7b8e2234e2d.png)<br>
   **For the training with 6 layers:** <br>
-  ![image7](https://user-images.githubusercontent.com/44468438/108235419-789ee880-714e-11eb-8d4a-c88209369ff0.png)<br>
+  <img src="https://user-images.githubusercontent.com/44468438/108235419-789ee880-714e-11eb-8d4a-c88209369ff0.png" width="90%" height="90%"> <br>
 
 
 ### Metrics - classification_loss_values.csv
