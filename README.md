@@ -161,12 +161,25 @@ keeping the initial hyperparameters constant and each time the selected
 hyperparameter will be changed.
 
 ### Experiments
-We executed the classification.py with optimized autoencoder model
-**L4_FS3_FL32_E100_B40** and different values for hyperparameters and these are the results: <br>
-  **● L4_FC32_Ex_B64: For the training with Epochs 100:** <br>
-  **● L4_FCx_E20_B64: For the training with Fc units 256:** <br>
-  **● L4_FC32_E20_Bx: For the training with Batch size 512:** <br>
-  **● Lx_FC32_E20_Bx: For the training with 6 layers:** <br>
+We executed the classification.py with optimized autoencoder model **L4_FS3_FL32_E100_B40** and different values for hyperparameters and these are the results: <br>
+  **● L4_FC32_Ex_B64:** <br>
+  ![image11](https://user-images.githubusercontent.com/44468438/108236048-24483880-714f-11eb-8aac-2ea5632743c6.png)<br>
+  **For the training with Epochs 100:** <br>
+  ![image1](https://user-images.githubusercontent.com/44468438/108235366-6de45380-714e-11eb-8f5d-4f6ab16275fa.png)
+  ![image2](https://user-images.githubusercontent.com/44468438/108235380-70df4400-714e-11eb-8995-a1d9c1031a42.png)<br>
+  **● L4_FCx_E20_B64:** <br>
+  ![image12](https://user-images.githubusercontent.com/44468438/108236052-24e0cf00-714f-11eb-9b4f-ffe2c4ac7073.png)<br>
+  **For the training with Fc units 256:** <br>
+  ![image3](https://user-images.githubusercontent.com/44468438/108235384-72107100-714e-11eb-85b9-58befa2e3a75.jpg)<br>
+  **● L4_FC32_E20_Bx:** <br>
+  ![image13](https://user-images.githubusercontent.com/44468438/108236054-25796580-714f-11eb-8370-ed404fd41432.png)<br>
+  **For the training with Batch size 512:** <br>
+  ![image5](https://user-images.githubusercontent.com/44468438/108235404-76d52500-714e-11eb-810b-a34ecfbe36f2.jpg)<br>
+  **● Lx_FC32_E20_Bx:** <br>
+  ![image14](https://user-images.githubusercontent.com/44468438/108236057-25796580-714f-11eb-8b99-b7b8e2234e2d.png)<br>
+  **For the training with 6 layers:** <br>
+  ![image7](https://user-images.githubusercontent.com/44468438/108235419-789ee880-714e-11eb-8d4a-c88209369ff0.png)<br>
+
 
 ### Metrics - classification_loss_values.csv
 | Layers | Fc_units | Epochs | Batch_Size | Train_Time         | Loss                   | Val_Loss              | Accuracy           | Val_Accuracy       |
