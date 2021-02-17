@@ -1,9 +1,10 @@
 # MACHINE LEARNING :radio_button:
 # Autoencoder-Neural-Network
+Assignment for lesson: [`Software Development for Algorithmic Problems`](https://www.di.uoa.gr/en/studies/undergraduate/261) (DI University of Athens)
 
 ## Authors:
-Vasiliki Koumarela 1115201600074 <br>
-Charalampos Katimertzis 1115201600062
+[Vasiliki Koumarela](https://github.com/VasiaKoum)
+[Charalampos Katimertzis](https://github.com/chariskms)
 
 ## Parts
 ### Part 1 : Convolutional Autoencoder
@@ -74,10 +75,15 @@ constant and each time the selected hyperparameter will be changed.
 We executed the autoencoder.py with different values for hyperparameters
 and these are the results: <br>
     **● L4_FS3_FL32_Ex_B64:** <br>
+    ![L4_FS3_FL32_Ex_B64](https://user-images.githubusercontent.com/44468438/108232979-ff9e9180-714b-11eb-91b3-18ad38c68a16.png) <br>
     **● Lx_FS3_FL16_E100_B64:** <br>
+    ![Lx_FS3_FL16_E100_B64](https://user-images.githubusercontent.com/44468438/108233326-55733980-714c-11eb-8a13-5fae785e9a0d.png) <br>
     **● L4_FS3_FL32_E100_Bx:** <br>
+    ![L4_FS3_FL32_E100_Bx](https://user-images.githubusercontent.com/44468438/108232877-e3025980-714b-11eb-876a-a8ddb3c792db.png) <br>
     **● L4_FSx_FL32_E100_B64:** <br>
+    ![L4_FSx_FL32_E100_B64](https://user-images.githubusercontent.com/44468438/108233087-1a710600-714c-11eb-9b27-c7eea6de0e45.png) <br>
     **● L4_FS3_FLx_E100_B64:** <br>
+    ![L4_FS3_FLx_E100_B64](https://user-images.githubusercontent.com/44468438/108233049-0fb67100-714c-11eb-9696-1795c4af0957.png)
     
 ### Metrics - loss_values.csv
 | Layers | Filter_Size | Filters/Layer | Epochs | Batch_Size | Train_Time         | Loss                   | Val_Loss               |
