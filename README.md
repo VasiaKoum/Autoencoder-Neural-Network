@@ -84,7 +84,8 @@ and these are the results: <br>
     **● L4_FSx_FL32_E100_B64:** <br>
     ![L4_FSx_FL32_E100_B64](https://user-images.githubusercontent.com/44468438/108233087-1a710600-714c-11eb-9b27-c7eea6de0e45.png) <br>
     **● L4_FS3_FLx_E100_B64:** <br>
-    ![L4_FS3_FLx_E100_B64](https://user-images.githubusercontent.com/44468438/108233049-0fb67100-714c-11eb-9696-1795c4af0957.png)
+    ![L4_FS3_FLx_E100_B64](https://user-images.githubusercontent.com/26937033/109151323-b0bbb200-7772-11eb-9243-88b8100e9294.png)
+
     
 ### Metrics - loss_values.csv
 | Layers | Filter_Size | Filters/Layer | Epochs | Batch_Size | Train_Time         | Loss                   | Val_Loss               |
